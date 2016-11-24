@@ -1,5 +1,3 @@
-//PESSEBRE V1.1 BY BBJ SOLUTIONS & ROBOT-EC
-
 //declarar llibreries wire, rtc i i2c
 #include <Wire.h>
 #include "RTClib.h"
@@ -12,7 +10,8 @@ const int Estats=50; //Num estats
 int MatriuEstats[Reles][Estats];
 
 String MatriuHoraInici[Estats]; 
-String MatriuHoraFi[Estats]; 
+
+//String MatriuHoraFi[Estats]; ???????????????????????????????
 
 int MatriuReles[Reles]
 
@@ -80,16 +79,25 @@ void InitMatriuEstats()
 
 void InitMatriuHoraInici()
 {
-  MatriuHoraInici = {"0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0"};
+    //Estat 1 Hora _ Minut _
+  MatriuHoraInici = { "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+                      "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+                      "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+                      "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+                      "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0"};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
-void InitMatriuHoraFi()
-{
-  MatriuHoraFi = {"0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0"};
-}
+//void InitMatriuHoraFi()
+//{
+//  MatriuHoraFi = {  "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+ //                     "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+ //                     "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+ //                     "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0",
+ //                     "0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0","0:0"};
+//}
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +156,20 @@ void Automatic()
   mi = (now.minute());
   ho = (now.hour());
 
-  //Repassem les seqüències
+  //Primer comprovem si hora+minut correspon a algun estat
+  for(int i=0; i<Estats; i++)
+  {
+    //Cas que la hora i el minut coincideixin per activar un rele
+    if(MatriuHoraInici[i] == String(ho) + ":" + String(mi))
+    {
+      //Mirem quins reles s'han d'activar per aquest estat
+      for(int j=0; j<Reles;j++)
+      {
+        if(MatriuEstats[j,i] == 1) digitalWrite(MatriuReles[j], HIGH);
+        if(MatriuEstats[j,i] == 0) digitalWrite(MatriuReles[j], LOW);
+      }
+    }
+  }
 
 }
 
@@ -159,131 +180,131 @@ void Manual()
 	switch(val)
   {
 		case 'A':
-      digitalWrite(rele1,HIGH);
+      digitalWrite(MatriuReles[1],HIGH);
     break; 
 
     case 'a':
-      digitalWrite(rele1,LOW);
+      digitalWrite(MatriuReles[1],LOW);
     break; 
 
     case 'B':
-      digitalWrite(rele2,HIGH);
+      digitalWrite(MatriuReles[2],HIGH);
     break; 
 
     case 'b':
-      digitalWrite(rele2,LOW);      
+      digitalWrite(MatriuReles[2],LOW);      
     break; 
 
     case 'C':
-      digitalWrite(rele3,HIGH);
+      digitalWrite(MatriuReles[3],HIGH);
     break; 
 
     case 'c':
-      digitalWrite(rele3,LOW);
+      digitalWrite(MatriuReles[3],LOW);
     break; 
 
     case 'D':
-      digitalWrite(rele4,HIGH);
+      digitalWrite(MatriuReles[4],HIGH);
     break; 
 
     case 'd':
-      digitalWrite(rele4,LOW);
+      digitalWrite(MatriuReles[4],LOW);
     break; 
 
     case 'E':
-      digitalWrite(rele5,HIGH);
+      digitalWrite(MatriuReles[5],HIGH);
     break; 
 
     case 'e':
-      digitalWrite(rele5,LOW);
+      digitalWrite(MatriuReles[5],LOW);
     break; 
 
     case 'F':
-      digitalWrite(rele6,HIGH);
+      digitalWrite(MatriuReles[6],HIGH);
     break; 
 
     case 'f':
-      digitalWrite(rele6,LOW);
+      digitalWrite(MatriuReles[6],LOW);
     break; 
 
     case 'G':
-      digitalWrite(rele7,HIGH);
+      digitalWrite(MatriuReles[7],HIGH);
     break; 
 
     case 'g':
-      digitalWrite(rele7,LOW);
+      digitalWrite(MatriuReles[7],LOW);
     break; 
 
     case 'H':
-      digitalWrite(rele8,HIGH);
+      digitalWrite(MatriuReles[8],HIGH);
     break; 
 
     case 'h':
-      digitalWrite(rele8,LOW);
+      digitalWrite(MatriuReles[8],LOW);
     break; 
 
     case 'I':
-      digitalWrite(rele9,HIGH);
+      digitalWrite(MatriuReles[9],HIGH);
     break; 
 
     case 'i':
-      digitalWrite(rele9,LOW);
+      digitalWrite(MatriuReles[9],LOW);
     break; 
 
     case 'J':
-      digitalWrite(rele10,HIGH);
+      digitalWrite(MatriuReles[10],HIGH);
     break; 
 
     case 'j':
-      digitalWrite(rele10,LOW);
+      digitalWrite(MatriuReles[10],LOW);
     break; 
 
     case 'K':
-      digitalWrite(rele11,HIGH);
+      digitalWrite(MatriuReles[11],HIGH);
     break; 
 
     case 'k':
-      digitalWrite(rele11,LOW);
+      digitalWrite(MatriuReles[11],LOW);
     break; 
 
     case 'L':
-      digitalWrite(rele12,HIGH);
+      digitalWrite(MatriuReles[12],HIGH);
     break; 
 
     case 'l':
-      digitalWrite(rele12,LOW);
+      digitalWrite(MatriuReles[12],LOW);
     break; 
 
     case 'M':
-      digitalWrite(rele13,HIGH);
+      digitalWrite(MatriuReles[13],HIGH);
     break; 
 
     case 'm':
-      digitalWrite(rele13,LOW);
+      digitalWrite(MatriuReles[13],LOW);
     break; 
     
     case 'N':
-      digitalWrite(rele14,HIGH);
+      digitalWrite(MatriuReles[14],HIGH);
     break; 
     
     case 'n':
-      digitalWrite(rele14,LOW);
+      digitalWrite(MatriuReles[14],LOW);
     break; 
 
     case 'O':
-      digitalWrite(rele15,HIGH);
+      digitalWrite(MatriuReles[15],HIGH);
     break; 
 
     case 'o':
-      digitalWrite(rele15,LOW);
+      digitalWrite(MatriuReles[15],LOW);
     break; 
 
     case 'P':
-      digitalWrite(rele16,HIGH);
+      digitalWrite(MatriuReles[16],HIGH);
     break; 
 
     case 'p':
-      digitalWrite(rele16,LOW);
+      digitalWrite(MatriuReles[16],LOW);
     break; 
 
     //El cas de R i r tenia entés que era per indicar si volies mode manual (R) o no (r) ????????????????????????????????
