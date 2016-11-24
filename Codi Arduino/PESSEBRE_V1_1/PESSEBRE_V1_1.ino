@@ -91,6 +91,7 @@ bt();
 
 
  DateTime now = RTC.now(); 
+ 
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);
@@ -103,6 +104,8 @@ bt();
     Serial.print(':');
     Serial.print(now.second(), DEC);
     Serial.println(); 
+
+
     delay(1000);
 
 
