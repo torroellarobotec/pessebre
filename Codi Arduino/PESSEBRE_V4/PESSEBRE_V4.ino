@@ -5,11 +5,15 @@
 
 int TempsInicial;
 int TempsActual;
-int Reproduint;
-int TempsReproduccio;
+int ReproduintDia;
+int ReproduintNit;
+int TempsReproduccioDia;
+int TempsReproduccioNit;
 
 const int Reles=16; //Num de reles 
 const int Estats=13; //Num estats
+
+SoftwareSerial mySerial(10, 11); // RX, TX /*veure quins ports utilitzem al mega
 
 //String MatriuHoraInici[Estats] =  { "0:0","5:0","10:0","15:0","20:0","25:0","25:40","26:20","27:0","27:30","27:50","28:20","29:10"};
 String MatriuHoraInici[Estats] =  { "0:0","0:30","1:0","1:30","2:0","2:30","3:0","3:30","4:0","4:30","5:0","5:30","6:0"};
@@ -101,7 +105,7 @@ void InitPins()
   }
   
   //Pin del PIR
-  pinMode(sensor_moviment, INPUT);
+  //pinMode(sensor_moviment, INPUT);
 
   //Pins del MP3??
 }
@@ -118,7 +122,18 @@ void InitBT()
 
 void setup()
 {
+  //delay(100);
   InitPins();//Inicialitzem tots els pins
+  InitBT();
+  TempsReproduccioDia = 2116;
+  TempsReproduccioNit = 1320;
+
+  ReproduintDia = 0;
+  ReproduintNit = 0;
+
+  mySerial.begin (9600);
+  mp3_set_serial (mySerial);  //set softwareSerial for DFPlayer-mini mp3 module 
+  mp3_set_volume (20);
 
   //RTC llegir hora rellotge pc i sincronitzarla al rtc
   Wire.begin(); // Shield I2C pins connect to alt I2C bus on Arduino Due
@@ -132,9 +147,41 @@ void setup()
 void loop()
 {
   delay(100);
-  Automatic();  
+  mp3_stop();  
+  reset();
+  
+  //TestMusica();
+  //Automatic();  
+  //TestReles();
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+
+void TestMusica()
+{
+  mp3_play(1);  
+  delay(30000);
+}
+
+void reset()
+{
+    digitalWrite(39,HIGH);  
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+void TestReles()
+{
+  for(int i=0;i<Reles;i++)
+  {
+    digitalWrite(MatriuReles[i], HIGH);
+    Serial.println("HIGH: " + String(i));
+    delay(10000);
+    digitalWrite(MatriuReles[i], LOW);
+    Serial.println("LOW: " + String(i));
+    delay(1000);
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 void Automatic()
@@ -146,14 +193,15 @@ void Automatic()
   mi = (now.minute());
   ho = (now.hour());
 
-  if(mi > 30) mi = mi-30;
+  if(mi > 11) mi = mi-18;
 
   //Primer comprovem si hora+minut correspon a algun estat
   for(int i=0; i<Estats; i++)
   {
     //Cas que el minut i la hora coincideixin per activar un rele
-    if(MatriuHoraInici[i] == String(mi) + ":" + String(se))
+    if(MatriuHoraInici[i] == (String(mi) + ":" + String(se)))
     {
+      //Serial.println((String(mi) + ":" + String(se));
       //Mirem quins reles s'han d'activar per aquest estat
       for(int j=0; j<Reles;j++)
       {
@@ -161,9 +209,44 @@ void Automatic()
         if(MatriuEstats[i][j] == 0) digitalWrite(MatriuReles[j], LOW);
       }
 
-      //Mirem si engegar o parar la música (0-Parat, 1-Pista1, 2-Pista3)
-
-      //if(MatriuEstats[j+1][i] == 1)
+      //Mirem si engegar o parar la música (0-Parat, 1-Pista1, 2-Pista3)      
+      if(MatriuEstats[i][Reles+1] == 1) //Música de dia
+      {
+        TempsActual = millis();
+        if((TempsActual - TempsInicial) < TempsReproduccioDia) 
+        { 
+          if(ReproduintDia == 0) 
+          {
+            mp3_play(1);
+            ReproduintDia = 1;
+            ReproduintNit = 0;
+          } 
+        }
+        else 
+        {
+          ReproduintDia = 0;
+          TempsInicial = millis();
+        }         
+      }
+      
+      if(MatriuEstats[i][Reles+1] == 2) //Música de nit
+      {
+        TempsActual = millis();
+        if((TempsActual - TempsInicial) < TempsReproduccioNit) 
+        { 
+          if(ReproduintNit == 0) 
+          {
+            mp3_play(2);
+            ReproduintNit = 1;
+            ReproduintDia = 0;
+          } 
+        }
+        else 
+        {
+          ReproduintNit = 0;
+          TempsInicial = millis();
+        }             
+      }
     }
   }
 
