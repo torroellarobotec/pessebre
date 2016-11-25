@@ -1,0 +1,34 @@
+void pintaEstat()
+{
+   i=digitalRead(13);
+   Serial.println(i);  
+}
+
+
+void llegirSerie()
+{
+  if (Serial.available() > 0) 
+  {
+                // read the incoming byte:
+                incomingByte = Serial.read();
+
+                if ((incomingByte >47) && (incomingByte<59))
+                {
+                  car=incomingByte-48;
+                }
+                if ((incomingByte >64) && (incomingByte<71))
+                {
+                  car=incomingByte-55;
+                }
+                if ((incomingByte >96) && (incomingByte<123))
+                {
+                  car=incomingByte-87;
+                }
+                 Serial.println(car);
+                 pintaEstat();
+                 // i=digitalRead(13);
+                 if (car==0) digitalWrite(13, HIGH);
+                 if (car==1) digitalWrite(13, LOW);
+                 
+        }
+}
