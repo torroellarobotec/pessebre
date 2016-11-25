@@ -16,7 +16,14 @@ const int Estats=13; //Num estats
 SoftwareSerial mySerial(10, 11); // RX, TX /*veure quins ports utilitzem al mega
 
 //String MatriuHoraInici[Estats] =  { "0:0","5:0","10:0","15:0","20:0","25:0","25:40","26:20","27:0","27:30","27:50","28:20","29:10"};
-String MatriuHoraInici[Estats] =  { "0:0","0:30","1:0","1:30","2:0","2:30","3:0","3:30","4:0","4:30","5:0","5:30","6:0"};
+//String MatriuHoraInici[Estats] =  { "0:0","0:30","1:0","1:30","2:0","2:30","3:0","3:30","4:0","4:30","5:0","5:30","6:0"};
+
+//MatriuHoraInici
+int MatriuHoraInici[Estats][2] = {
+  {0,0},{0,30},{1,0},{1,30},{2,0},{2,30},{3,0},{3,30},{4,0},{4,30},{5,0},{5,30},{6,0}
+};
+
+
 /*
 int MatriuEstats[Reles+1][Estats] = {   
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //Rele1  Bomba moli + Gir Moli +Led Moli
@@ -40,8 +47,8 @@ int MatriuEstats[Reles+1][Estats] = {
 */
 
 int MatriuEstats[Estats][Reles+1] = {
-   //1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7
    //Dia
+   //1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7   
     {0,0,1,1,0,1,1,1,0,0,1,1,0,1,1,1,1},
     {1,1,1,1,0,1,1,1,0,0,1,1,0,1,1,1,1},
     {0,0,1,1,0,1,1,1,0,0,1,1,0,1,1,1,1},
@@ -82,8 +89,8 @@ int MatriuReles[Reles] = {9,8,7,6,5,4,3,2,39,41,43,45,47,49,51,53};
 
 
 //definim sensor de presencia
-#define sensor_moviment  13
-int v_sensor_moviment;
+//#define sensor_moviment  13
+//int v_sensor_moviment;
 
 //Variables de temps RTC
 int mi,ho,se;
@@ -106,8 +113,6 @@ void InitPins()
   
   //Pin del PIR
   //pinMode(sensor_moviment, INPUT);
-
-  //Pins del MP3??
 }
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -122,18 +127,22 @@ void InitBT()
 
 void setup()
 {
-  //delay(100);
+  delay(1000);
+  
   InitPins();//Inicialitzem tots els pins
   InitBT();
-  TempsReproduccioDia = 2116;
-  TempsReproduccioNit = 1320;
+  
+  TempsReproduccioDia = (2*60+16)*1000; //Dura 2 minuts i 16 segons
+  TempsReproduccioNit = (1*60+32)*1000; //Dura 1 minut i 32 segons
 
-  ReproduintDia = 0;
-  ReproduintNit = 0;
-
+  //Incialitzem MP3
   mySerial.begin (9600);
   mp3_set_serial (mySerial);  //set softwareSerial for DFPlayer-mini mp3 module 
   mp3_set_volume (20);
+  
+  ReproduintDia = 0;
+  ReproduintNit = 0;
+
 
   //RTC llegir hora rellotge pc i sincronitzarla al rtc
   Wire.begin(); // Shield I2C pins connect to alt I2C bus on Arduino Due
@@ -146,9 +155,9 @@ void setup()
 ////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
-  delay(100);
   mp3_stop();  
-  reset();
+  
+  //reset();
   
   //TestMusica();
   //Automatic();  
@@ -174,12 +183,13 @@ void TestReles()
 {
   for(int i=0;i<Reles;i++)
   {
+    Serial.print("Rele: " + String(i+1) + " Pin: " + String(MatriuReles[i]) + " HIGH");
     digitalWrite(MatriuReles[i], HIGH);
-    Serial.println("HIGH: " + String(i));
-    delay(10000);
+    delay(5000);
+
+    Serial.print("Rele: " + String(i+1) + " Pin: " + String(MatriuReles[i]) + " LOW");
     digitalWrite(MatriuReles[i], LOW);
-    Serial.println("LOW: " + String(i));
-    delay(1000);
+    delay(2000);
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,15 +203,15 @@ void Automatic()
   mi = (now.minute());
   ho = (now.hour());
 
-  if(mi > 11) mi = mi-18;
+  if(mi > 10) mi = mi-11;
 
   //Primer comprovem si hora+minut correspon a algun estat
   for(int i=0; i<Estats; i++)
   {
     //Cas que el minut i la hora coincideixin per activar un rele
-    if(MatriuHoraInici[i] == (String(mi) + ":" + String(se)))
+    //if(MatriuHoraInici[i] == (String(mi) + ":" + String(se)))
+    if(MatriuHoraInici[i][0] == mi and MatriuHoraInici[i][1] == se)
     {
-      //Serial.println((String(mi) + ":" + String(se));
       //Mirem quins reles s'han d'activar per aquest estat
       for(int j=0; j<Reles;j++)
       {
