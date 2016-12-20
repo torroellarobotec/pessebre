@@ -84,22 +84,8 @@ int MatriuEstats[Estats][Reles + 1] = {
   {0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 2}
 };
 
-// 9 Bomba moli + Gir Moli +Led Moli
-// 8 Moli canto cova
-// 7 Boira
-// 6 Llum llac
-// 5 relé que no clava (NU) NO FUNCIONA!!
-// 4 On/Off Màquina de fum
-// 3 Infern + bomba de recirculació riu + foc + llamp + 3 bombetes vermelles
-// 2 Cel
-// 36 Dimmer
-// 34 Naixement + sol + lluna
-// 32 Polsador contacte Màquina de fum
-// 30 Ermita
-// 28 Llabià
-// 26 Senyera
-// 24 Castell
-// 22 Masia
+// Definició dels relés en docment a part
+//
 int MatriuReles[Reles] = {9, 8, 7, 6, 5, 4, 3, 2, 53, 51, 49, 47, 45, 43, 41, 39};
 
 //Variables de temps RTC
@@ -261,12 +247,13 @@ void pintaSegments( int minu, int seg, int eventActual)
   // (note: line 1 is the second row, since counting begins with 0):
   //lcd.home();
   // print the number of seconds since reset:
-  String cad = "";
+  String cad = "Estat:";
   cad += (eventActual / 10);
   cad += (eventActual % 10);
-  cad += " >";
+  
 
   int seguentEstat = eventActual + 1;
+  cad+=" > ";
   if (seguentEstat >= Estats)
   {
     seguentEstat = 0;
@@ -285,11 +272,28 @@ void pintaSegments( int minu, int seg, int eventActual)
 
 
 
-  lcd.print("Estat: " + cad);
+  lcd.print( cad);
 
   cad = "";
   lcd.setCursor(0, 1);
-  cad += "Minut: " ;
+
+Time t = rtc.time();
+
+
+  int hora = (int)t.hr;
+  int mi = (int)t.min;
+  int se = (int)t.sec;
+ cad += (hora / 10);
+  cad += (hora % 10);
+    cad += ":";
+ cad += (mi / 10);
+  cad += (mi % 10);
+    cad += ":";
+     cad += (se / 10);
+  cad += (se % 10);
+    cad += "   ";
+    
+ 
   cad += (minu / 10);
   cad += (minu % 10);
   cad += ":";
