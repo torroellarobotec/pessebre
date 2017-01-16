@@ -83,6 +83,8 @@ RTC_DS1307 RTC;
 
 void loop()
 {
+  
+    //Serial.println("hello");
   //mp3_stop();  
 
   llegirSerie();
@@ -90,7 +92,7 @@ void loop()
   //reset();
   
   //TestMusica();
-  Automatic();  
+  //Automatic();  
   //TestReles();
 }
 
@@ -121,6 +123,8 @@ void InitBT()
 
 void setup()
 {
+  Serial.begin(9600);  
+  /*
   delay(1000);
 
   mp3_stop ();
@@ -145,6 +149,7 @@ void setup()
   Wire.begin(); // Shield I2C pins connect to alt I2C bus on Arduino Due
   RTC.begin(); // Shield I2C pins connect to alt I2C bus on Arduino Due
   RTC.adjust(DateTime(__DATE__, __TIME__)); //Sincronitza la hora amb el pc que compila
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -521,6 +526,8 @@ void llegirSerie()
                 // read the incoming byte:
                 int incomingByte = Serial.read();
 
+                Serial.println(incomingByte);
+                
                 if ((incomingByte >47) && (incomingByte<59))
                 {
                   car=incomingByte-48;
